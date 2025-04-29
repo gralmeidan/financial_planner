@@ -1,0 +1,30 @@
+include: package:flutter_lints/flutter.yaml
+
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options
+linter:
+  rules:
+    - prefer_const_constructors
+    - prefer_const_constructors_in_immutables
+    - prefer_const_literals_to_create_immutables
+    - prefer_const_declarations
+    - prefer_single_quotes
+    - directives_ordering
+    - prefer_relative_imports
+    - prefer_interpolation_to_compose_strings
+    - eol_at_end_of_file
+    - require_trailing_commas
+    - always_declare_return_types
+    - empty_catches
+    - empty_constructor_bodies
+    - camel_case_types
+    - file_names
+    - constant_identifier_names
+    - unnecessary_late
+    - unnecessary_getters_setters
+    - unnecessary_parenthesis
+    - use_key_in_widget_constructors
+    - no_leading_underscores_for_local_identifiers
+    - no_leading_underscores_for_library_prefixes
+    - library_private_types_in_public_api
+    - sort_child_properties_last
