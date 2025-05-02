@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'routing/pages/home/home.view_model.dart';
 import 'routing/routing.dart';
 import 'styles/theme.dart';
 
@@ -18,6 +19,14 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.dark,
       getPages: AppRoutes.pages,
       initialRoute: AppRoutes.home,
+      initialBinding: AppBindings(),
     );
+  }
+}
+
+class AppBindings extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut(() => HomeViewModel());
   }
 }
