@@ -24,35 +24,6 @@ class _ExpenseCardState extends State<ExpenseCard>
     duration: const Duration(milliseconds: 300),
   );
 
-  double total = 0;
-
-  void _calcTotal() {
-    if (widget.data.children.isNotEmpty) {
-      for (var element in widget.data.children) {
-        total += element.amount ?? 0;
-      }
-
-      return;
-    }
-
-    total = widget.data.amount ?? 0;
-  }
-
-  @override
-  void initState() {
-    _calcTotal();
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(covariant ExpenseCard oldWidget) {
-    if (oldWidget.data != widget.data) {
-      _calcTotal();
-    }
-
-    super.didUpdateWidget(oldWidget);
-  }
-
   @override
   Widget build(BuildContext context) {
     const padding = EdgeInsets.symmetric(horizontal: 16);
@@ -60,7 +31,7 @@ class _ExpenseCardState extends State<ExpenseCard>
 
     if (widget.data.children.isEmpty) {
       return ListTile(
-        title: Text(total.toCurrency),
+        title: Text(widget.data.total.toCurrency),
         subtitle: Text(widget.data.name),
         contentPadding: indented,
       );
@@ -69,7 +40,7 @@ class _ExpenseCardState extends State<ExpenseCard>
     return Column(
       children: [
         ListTile(
-          title: Text(total.toCurrency),
+          title: Text(widget.data.total.toCurrency),
           subtitle: Text(widget.data.name),
           contentPadding: indented,
           trailing: AnimatedChevron(

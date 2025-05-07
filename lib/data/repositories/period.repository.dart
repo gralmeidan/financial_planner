@@ -26,6 +26,25 @@ class RecordRepository {
             ),
           ],
         ),
+        FinancialRecord(
+          'Viagem',
+          DateTime.now(),
+          children: [
+            FinancialRecord(
+              'Transporte',
+              DateTime.now(),
+              children: [
+                FinancialRecord(
+                  'Ônibus',
+                  DateTime.now(),
+                  children: [
+                    FinancialRecord('Passagem', DateTime.now(), amount: 50.0),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
         FinancialRecord('Comida', DateTime.now(), amount: 11.23),
       ],
     );

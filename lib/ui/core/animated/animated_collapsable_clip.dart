@@ -36,11 +36,13 @@ class _AnimatedCollapsableClipState extends State<AnimatedCollapsableClip> {
     final renderObject = _childKey.currentContext?.findRenderObject();
     final size = renderObject is RenderBox ? renderObject.size : Size.zero;
 
-    // TODO: AJUSTAR ISSIO AQUI
-    final clip =
-        context.dependOnInheritedWidgetOfExactType<_CollapsableScope>();
+    double maxSize = size.height + widget.padding;
 
-    _maxSize = size.height + widget.padding;
+    if (maxSize == _maxSize) {
+      return;
+    }
+
+    _maxSize = maxSize;
 
     _animation = Tween<double>(
       begin: widget.collapsedHeight,
@@ -62,6 +64,14 @@ class _AnimatedCollapsableClipState extends State<AnimatedCollapsableClip> {
             ),
           );
         } else {
+          if (_animation!.value == _maxSize) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _afterLayout(null);
+            });
+
+            return child!;
+          }
+
           return ClipRect(
             child: SizedOverflowBox(
               alignment: Alignment.topCenter,
@@ -74,22 +84,6 @@ class _AnimatedCollapsableClipState extends State<AnimatedCollapsableClip> {
       child: SizedBox(key: _childKey, child: widget.child),
     );
   }
-}
-
-class _CollapsableScope extends InheritedWidget {
-  final _AnimatedCollapsableClipState state;
-  final double maxSize;
-
-  const _CollapsableScope({
-    required this.state,
-    required super.child,
-    required this.maxSize,
-  });
-
-  @override
-  bool updateShouldNotify(covariant _CollapsableScope oldWidget) =>
-      state._animation != oldWidget.state._animation ||
-      maxSize != oldWidget.maxSize;
 }
 
 class AnimatedCollapsableController {

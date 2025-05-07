@@ -8,6 +8,16 @@ class _FinancialRecord {
   late double? amount;
   late DateTime createdAt;
   List<_FinancialRecord> children = [];
+
+  double get total {
+    if (children.isNotEmpty) {
+      return children.fold(0, (previousValue, element) {
+        return previousValue + (element.total);
+      });
+    }
+
+    return amount ?? 0;
+  }
 }
 
 @RealmModel()
