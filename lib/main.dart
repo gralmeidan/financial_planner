@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'routing/pages/home/home.view_model.dart';
 import 'routing/routing.dart';
 import 'styles/theme.dart';
+import 'ui/expenses/create_expense/create_expense.view_model.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,5 +29,6 @@ class AppBindings extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => HomeViewModel());
+    Get.lazyPut(() => CreateExpenseViewModel());
   }
 }

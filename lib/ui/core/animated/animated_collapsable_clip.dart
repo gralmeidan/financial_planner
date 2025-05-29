@@ -95,7 +95,6 @@ class AnimatedCollapsableController {
     required Duration duration,
   }) {
     size = AnimationController(vsync: vsync, duration: duration);
-
     chevron = AnimationController(vsync: vsync, duration: duration);
   }
 

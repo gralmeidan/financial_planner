@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../ui/expenses/create_expense/expense_form.dart';
 import '../../../ui/expenses/expense_card.dart';
 import 'home.view_model.dart';
 
@@ -25,6 +26,14 @@ class HomePage extends GetView<HomeViewModel> {
               ),
           ],
         ),
+      ),
+      floatingActionButton: Builder(
+        builder: (context) {
+          return FloatingActionButton(
+            onPressed: () => ExpenseFormBottomSheet.show(context),
+            child: const Icon(Icons.add),
+          );
+        },
       ),
     );
   }
