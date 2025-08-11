@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../utils/extensions.dart';
 import '../../../../utils/masks.dart';
 import '../../../../utils/validators.dart';
 import '../custom_form.dart';
+import 'text_form_input_decoration.dart';
 
 class TextFormInputController extends TextEditingController
     implements FormFieldController {
@@ -12,6 +15,7 @@ class TextFormInputController extends TextEditingController
   final List<TextMask> masks;
   final List<Validator<String>> validators;
   final TextInputType? keyboardType;
+  final FocusNode focusNode = FocusNode();
 
   TextFormInputController({
     this.label,
@@ -47,6 +51,7 @@ class TextFormInput extends StatefulWidget {
 
 class _TextFormInputState extends State<TextFormInput> {
   bool showSufix = false;
+  bool isFocused = false;
 
   void _handleTextChange() {
     setState(() {
@@ -54,15 +59,23 @@ class _TextFormInputState extends State<TextFormInput> {
     });
   }
 
+  void _handleFocusChange() {
+    setState(() {
+      isFocused = widget.controller.focusNode.hasFocus;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(_handleTextChange);
+    widget.controller.focusNode.addListener(_handleFocusChange);
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(_handleTextChange);
+    widget.controller.focusNode.removeListener(_handleFocusChange);
     super.dispose();
   }
 
@@ -81,6 +94,29 @@ class _TextFormInputState extends State<TextFormInput> {
   @override
   Widget build(BuildContext context) {
     CustomForm.of(context).register(widget.controller);
+
+    return TextFormInputDecoratedContainer(
+      isFocused: isFocused,
+      decoration: TextFormInputDecoration(
+        label: widget.controller.label,
+        prefix: Trailing(
+          child: Icon(
+            Icons.check_circle_outline,
+            color:
+                isFocused
+                    ? context.colors.primary
+                    : context.colors.onSurfaceVariant,
+          ),
+        ),
+      ),
+      child: TextField(
+        controller: widget.controller,
+        focusNode: widget.controller.focusNode,
+        style: context.text.bodyLarge!,
+        cursorColor: context.colors.primary,
+        decoration: null,
+      ),
+    );
 
     return TextFormField(
       controller: widget.controller,
