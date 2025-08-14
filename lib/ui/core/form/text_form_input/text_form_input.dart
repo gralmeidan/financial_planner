@@ -81,24 +81,26 @@ class _TextFormInputState extends State<TextFormInput> {
 
   @override
   void deactivate() {
-    CustomForm.of(context).unregister(widget.controller);
+    // CustomForm.of(context).unregister(widget.controller);
     super.deactivate();
   }
 
   @override
   void didChangeDependencies() {
-    CustomForm.of(context).unregister(widget.controller);
+    // CustomForm.of(context).unregister(widget.controller);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    CustomForm.of(context).register(widget.controller);
+    // CustomForm.of(context).register(widget.controller);
 
     return TextFormInputDecoratedContainer(
       isFocused: isFocused,
+      isEmpty: widget.controller.text.isEmpty,
       decoration: TextFormInputDecoration(
         label: widget.controller.label,
+        placeholder: 'Placeholder',
         prefix: Trailing(
           child: Icon(
             Icons.check_circle_outline,

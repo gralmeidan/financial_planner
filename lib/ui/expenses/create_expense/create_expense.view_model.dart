@@ -7,7 +7,9 @@ import '../../core/form/custom_form.dart';
 import '../../core/form/form.dart';
 
 class CreateExpenseViewModel extends GetxController {
-  final nameController = TextFormInputController(label: 'Nome');
+  final nameController = TextFormInputController(
+    label: 'Nome Long Coisa Grande, Muito Grande, Muito, Muito Grande',
+  );
   final valueController = TextFormInputController(
     label: 'Valor',
     prefix: 'R\$ ',
