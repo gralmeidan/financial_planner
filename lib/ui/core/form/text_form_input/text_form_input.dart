@@ -49,14 +49,8 @@ class TextFormInput extends StatefulWidget {
 }
 
 class _TextFormInputState extends State<TextFormInput> {
-  bool showSufix = false;
   bool isFocused = false;
-
-  void _handleTextChange() {
-    setState(() {
-      showSufix = widget.controller.text.isNotEmpty;
-    });
-  }
+  bool isEmpty = false;
 
   void _handleFocusChange() {
     setState(() {
@@ -64,17 +58,25 @@ class _TextFormInputState extends State<TextFormInput> {
     });
   }
 
+  void _handleTextChange() {
+    setState(() {
+      isEmpty = widget.controller.text.isEmpty;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(_handleTextChange);
     widget.controller.focusNode.addListener(_handleFocusChange);
+    widget.controller.addListener(_handleTextChange);
+
+    isEmpty = widget.controller.text.isEmpty;
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_handleTextChange);
     widget.controller.focusNode.removeListener(_handleFocusChange);
+    widget.controller.removeListener(_handleTextChange);
     super.dispose();
   }
 
@@ -93,21 +95,16 @@ class _TextFormInputState extends State<TextFormInput> {
   @override
   Widget build(BuildContext context) {
     // CustomForm.of(context).register(widget.controller);
-
+    print('For: ${widget.controller.label} isEmpty: $isEmpty');
     return TextFormInputDecoratedContainer(
       isFocused: isFocused,
-      isEmpty: widget.controller.text.isEmpty,
+      isEmpty: isEmpty,
       decoration: TextFormInputDecoration(
         label: widget.controller.label,
         placeholder: 'Placeholder',
-        prefix: Trailing(
-          child: Icon(
-            Icons.check_circle_outline,
-            color:
-                isFocused
-                    ? context.colors.primary
-                    : context.colors.onSurfaceVariant,
-          ),
+        prefix: const Trailing.text('R\$'),
+        suffix: Trailing.builder(
+          (context, color) => Icon(Icons.close, color: color),
         ),
       ),
       child: TextField(

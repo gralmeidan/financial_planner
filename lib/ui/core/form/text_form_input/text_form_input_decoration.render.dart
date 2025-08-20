@@ -31,6 +31,7 @@ class InputLayoutId extends ParentDataWidget<_InputIdParentData> {
 class RenderInputDecoration extends MultiChildRenderObjectWidget {
   final BorderRadius borderRadius;
   final EdgeInsets contentPadding;
+  final double spacing;
 
   final Animation<Color?> color;
   final Animation<double> labelT;
@@ -45,6 +46,7 @@ class RenderInputDecoration extends MultiChildRenderObjectWidget {
     super.key,
     required this.borderRadius,
     required this.contentPadding,
+    required this.spacing,
     required this.color,
     required this.labelT,
     this.labelText,
@@ -60,6 +62,7 @@ class RenderInputDecoration extends MultiChildRenderObjectWidget {
     return _RenderInputDecorator(
       borderRadius: borderRadius,
       contentPadding: contentPadding,
+      spacing: spacing,
       color: color,
       labelT: labelT,
       labelText: labelText,
@@ -79,6 +82,7 @@ class RenderInputDecoration extends MultiChildRenderObjectWidget {
     renderObject
       ..borderRadius = borderRadius
       ..contentPadding = contentPadding
+      ..spacing = spacing
       ..attachListenables(
         color: color,
         labelT: labelT,
@@ -98,6 +102,7 @@ class _RenderInputDecorator extends RenderBox
   _RenderInputDecorator({
     required BorderRadius borderRadius,
     required EdgeInsets contentPadding,
+    required double spacing,
     required Animation<Color?> color,
     required Animation<double> labelT,
     required String? labelText,
@@ -107,6 +112,7 @@ class _RenderInputDecorator extends RenderBox
     required TextStyle? placeholderStyle,
   }) : _borderRadius = borderRadius,
        _contentPadding = contentPadding,
+       _spacing = spacing,
        _labelText = labelText,
        _labelStyle = labelStyle,
        _placeholderText = placeholderText,
@@ -126,6 +132,13 @@ class _RenderInputDecorator extends RenderBox
   set contentPadding(EdgeInsets v) {
     if (_contentPadding == v) return;
     _contentPadding = v;
+    markNeedsLayout();
+  }
+
+  double _spacing;
+  set spacing(double v) {
+    if (_spacing == v) return;
+    _spacing = v;
     markNeedsLayout();
   }
 
@@ -316,9 +329,17 @@ class _RenderInputDecorator extends RenderBox
 
     double availableWidth;
 
+    final leftGap = prefixSize.width > 0 ? _spacing : 0.0;
+    final rightGap = suffixSize.width > 0 ? _spacing : 0.0;
+
     if (maxW.isFinite) {
       availableWidth = max(
-        maxW - _contentPadding.horizontal - prefixSize.width - suffixSize.width,
+        maxW -
+            _contentPadding.horizontal -
+            prefixSize.width -
+            suffixSize.width -
+            leftGap -
+            rightGap,
         0.0,
       );
     } else {
@@ -336,7 +357,9 @@ class _RenderInputDecorator extends RenderBox
         _contentPadding.horizontal +
         prefixSize.width +
         _input.size.width +
-        suffixSize.width;
+        suffixSize.width +
+        leftGap +
+        rightGap;
     final width = hasBoundedW ? constraints.constrainWidth(rawW) : rawW;
 
     final rawH =
@@ -351,11 +374,11 @@ class _RenderInputDecorator extends RenderBox
     double x = _contentPadding.left;
 
     if (_setOffset(InputSlot.prefix, Offset(x, centerY(prefixSize.height)))) {
-      x += prefixSize.width;
+      x += prefixSize.width + leftGap;
     }
 
     if (_setOffset(InputSlot.input, Offset(x, centerY(inputSize.height)))) {
-      x += inputSize.width;
+      x += _input.size.width + rightGap;
     }
 
     if (_setOffset(InputSlot.suffix, Offset(x, centerY(suffixSize.height)))) {
@@ -376,6 +399,9 @@ class _RenderInputDecorator extends RenderBox
     final rect = offset & size;
     double borderHole = 0.0;
 
+    final leftGap = (_prefixW > 0 ? _spacing + _prefixW : 0.0);
+    final rightGap = (_suffixW > 0 ? _spacing + _suffixW : 0.0);
+
     if (_labelText != null) {
       final value = _labelT?.value ?? 0.0;
       final scaleDown = 0.1 * value;
@@ -394,16 +420,28 @@ class _RenderInputDecorator extends RenderBox
         ellipsis: '...',
       );
 
+      final disregardedLeftConstraints = leftGap * value;
+      final disregardedRightConstraints = rightGap * value;
+      final disregardedHorizontalConstraints =
+          disregardedLeftConstraints + disregardedRightConstraints;
+
       textPainter.layout(
-        maxWidth: size.width - (_contentPadding.left) - (_contentPadding.right),
+        maxWidth:
+            size.width -
+            (_contentPadding.left) -
+            (_contentPadding.right) -
+            _prefixW -
+            rightGap +
+            disregardedHorizontalConstraints,
       );
 
-      final labelOffset = Offset(
-        rect.left + _contentPadding.left,
-        (size.height - textPainter.height) / 2 -
-            value * (textPainter.height * (1 + scaleDown)) +
-            offset.dy,
-      );
+      final labelOffset =
+          offset +
+          Offset(
+            _contentPadding.left + leftGap - disregardedLeftConstraints,
+            (size.height - textPainter.height) / 2 -
+                value * (textPainter.height * (1 + scaleDown)),
+          );
 
       borderHole = textPainter.size.width * value;
 
@@ -434,7 +472,10 @@ class _RenderInputDecorator extends RenderBox
 
       final placeHolderOffset =
           offset +
-          Offset(_contentPadding.left, (size.height - textPainter.height) / 2);
+          Offset(
+            _contentPadding.left + leftGap,
+            (size.height - textPainter.height) / 2,
+          );
 
       textPainter.paint(canvas, placeHolderOffset);
     }

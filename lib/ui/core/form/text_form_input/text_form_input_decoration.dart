@@ -3,15 +3,48 @@ import 'package:flutter/material.dart';
 import 'text_form_input_decoration.render.dart';
 
 const _kDefPadding = EdgeInsets.all(16);
+const _kDefSpacing = 8.0;
+
+enum _TrailingType { text, child, builder }
 
 class Trailing {
   final Widget? child;
   final String? text;
   final TextStyle? style;
+  final Widget Function(BuildContext context, Color? color)? builder;
 
-  const Trailing.text(this.text, {this.style}) : child = null;
+  final _TrailingType _type;
 
-  const Trailing({required Widget this.child}) : text = null, style = null;
+  const Trailing.text(this.text, {this.style})
+    : child = null,
+      builder = null,
+      _type = _TrailingType.text;
+
+  const Trailing.child(this.child)
+    : text = null,
+      style = null,
+      builder = null,
+      _type = _TrailingType.child;
+
+  const Trailing.builder(this.builder)
+    : text = null,
+      style = null,
+      child = null,
+      _type = _TrailingType.builder;
+
+  Widget build(BuildContext context, Color? color) {
+    switch (_type) {
+      case _TrailingType.text:
+        return Text(
+          text ?? '',
+          style: style?.copyWith(color: color) ?? TextStyle(color: color),
+        );
+      case _TrailingType.child:
+        return child ?? const SizedBox.shrink();
+      case _TrailingType.builder:
+        return builder!.call(context, color);
+    }
+  }
 }
 
 class TextFormInputDecoration {
@@ -88,6 +121,9 @@ class _TextFormInputDecoratedContainerState
       placeholderStyle: decor?.placeholderStyle ?? theme.textTheme.bodyMedium,
       isShowingPlaceholder: isShowingPlaceholder,
       contentPadding: decor?.contentPadding ?? _kDefPadding,
+      spacing: _kDefSpacing,
+      prefix: decor?.prefix,
+      suffix: decor?.suffix,
       child: widget.child,
     );
   }
@@ -95,8 +131,8 @@ class _TextFormInputDecoratedContainerState
 
 class _AnimatedBorder extends StatefulWidget {
   final Widget child;
-  final Color color;
-  final BorderRadius borderRadius;
+  final Trailing? prefix;
+  final Trailing? suffix;
 
   final String? label;
   final TextStyle? labelStyle;
@@ -106,17 +142,23 @@ class _AnimatedBorder extends StatefulWidget {
   final TextStyle? placeholderStyle;
   final bool isShowingPlaceholder;
 
+  final Color color;
+  final double spacing;
+  final BorderRadius borderRadius;
   final EdgeInsets contentPadding;
 
   const _AnimatedBorder({
     required this.child,
     required this.color,
     required this.borderRadius,
+    required this.spacing,
     required this.label,
     required this.labelStyle,
     required this.placeholder,
     required this.placeholderStyle,
     required this.contentPadding,
+    required this.prefix,
+    required this.suffix,
     this.isLabelOnTop = false,
     this.isShowingPlaceholder = false,
   });
@@ -206,11 +248,33 @@ class _AnimatedBorderState extends State<_AnimatedBorder>
     super.dispose();
   }
 
+  InputLayoutId _buildTrailing(
+    BuildContext context,
+    Trailing trailing,
+    InputSlot slot,
+  ) {
+    Widget child;
+
+    if (trailing.child == null) {
+      child = AnimatedBuilder(
+        animation: _colorAnimation,
+        builder: (context, child) {
+          return trailing.build(context, _colorAnimation.value);
+        },
+      );
+    } else {
+      child = trailing.build(context, _colorAnimation.value);
+    }
+
+    return InputLayoutId(slot: slot, child: child);
+  }
+
   @override
   Widget build(BuildContext context) {
     return RenderInputDecoration(
       borderRadius: widget.borderRadius,
       contentPadding: widget.contentPadding,
+      spacing: widget.spacing,
       color: _colorAnimation,
       labelT: _labelAnimation,
       labelText: widget.label,
@@ -218,7 +282,13 @@ class _AnimatedBorderState extends State<_AnimatedBorder>
       placeHolderT: _placeholderAnimation,
       placeHolderText: widget.placeholder,
       placeHolderStyle: widget.placeholderStyle,
-      children: [InputLayoutId(slot: InputSlot.input, child: widget.child)],
+      children: [
+        if (widget.prefix != null)
+          _buildTrailing(context, widget.prefix!, InputSlot.prefix),
+        InputLayoutId(slot: InputSlot.input, child: widget.child),
+        if (widget.suffix != null)
+          _buildTrailing(context, widget.suffix!, InputSlot.suffix),
+      ],
     );
   }
 }
