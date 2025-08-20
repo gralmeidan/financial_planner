@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -117,34 +116,6 @@ class _TextFormInputState extends State<TextFormInput> {
         style: context.text.bodyLarge!,
         cursorColor: context.colors.primary,
         decoration: null,
-      ),
-    );
-
-    return TextFormField(
-      controller: widget.controller,
-      inputFormatters: widget.controller.inputFormatters,
-      keyboardType: widget.controller.keyboardType,
-      decoration: InputDecoration(
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-        labelText: widget.controller.label,
-        prefixText: widget.controller.prefix,
-        suffix: Visibility(
-          visible: showSufix,
-          replacement: const SizedBox(height: 24),
-          child: InkWell(
-            onTap: () {
-              widget.controller.clear();
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Icon(
-                Icons.cancel_outlined,
-                color:
-                    Theme.of(context).inputDecorationTheme.outlineBorder?.color,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
