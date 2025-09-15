@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -362,9 +363,12 @@ class _RenderInputDecorator extends RenderBox
         rightGap;
     final width = hasBoundedW ? constraints.constrainWidth(rawW) : rawW;
 
-    final rawH =
-        _contentPadding.vertical +
-        max(_input.size.height, max(prefixSize.height, suffixSize.height));
+    /// TODO: ACEITAR UM `suffixPadding` e um `prefixPadding` ao invés de só zerar
+    /// o padding do sufixo
+    final rawH = max(
+      _input.size.height + _contentPadding.vertical,
+      max(prefixSize.height + _contentPadding.vertical, suffixSize.height),
+    );
     final height = hasBoundedH ? constraints.constrainHeight(rawH) : rawH;
 
     size = Size(width, height);
@@ -439,8 +443,11 @@ class _RenderInputDecorator extends RenderBox
           offset +
           Offset(
             _contentPadding.left + leftGap - disregardedLeftConstraints,
-            (size.height - textPainter.height) / 2 -
-                value * (textPainter.height * (1 + scaleDown)),
+            lerpDouble(
+              (size.height - textPainter.height) / 2, // center
+              -textPainter.height / 2, // top
+              value,
+            )!,
           );
 
       borderHole = textPainter.size.width * value;

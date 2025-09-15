@@ -14,6 +14,7 @@ class TextFormInputController extends TextEditingController
   final List<TextMask> masks;
   final List<Validator<String>> validators;
   final TextInputType? keyboardType;
+  final String? placeholder;
   final FocusNode focusNode = FocusNode();
 
   TextFormInputController({
@@ -22,6 +23,7 @@ class TextFormInputController extends TextEditingController
     this.keyboardType,
     this.masks = const [],
     this.validators = const [],
+    this.placeholder,
   });
 
   List<TextInputFormatter> get inputFormatters =>
@@ -95,16 +97,29 @@ class _TextFormInputState extends State<TextFormInput> {
   @override
   Widget build(BuildContext context) {
     // CustomForm.of(context).register(widget.controller);
-    print('For: ${widget.controller.label} isEmpty: $isEmpty');
+
     return TextFormInputDecoratedContainer(
       isFocused: isFocused,
       isEmpty: isEmpty,
       decoration: TextFormInputDecoration(
         label: widget.controller.label,
-        placeholder: 'Placeholder',
-        prefix: const Trailing.text('R\$'),
+        placeholder: widget.controller.placeholder,
+
+        prefix:
+            widget.controller.prefix != null
+                ? Trailing.text(
+                  widget.controller.prefix!,
+                  style: context.text.bodyLarge,
+                )
+                : null,
         suffix: Trailing.builder(
-          (context, color) => Icon(Icons.close, color: color),
+          (context, color) => IconButton(
+            onPressed: () {
+              widget.controller.clear();
+              widget.controller.focusNode.requestFocus();
+            },
+            icon: Icon(Icons.cancel_outlined, color: color),
+          ),
         ),
       ),
       child: TextField(
