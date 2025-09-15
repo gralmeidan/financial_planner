@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../../../utils/masks.dart';
 import '../../../utils/validators.dart';
-import '../../core/form/custom_form.dart';
 import '../../core/form/form.dart';
+import '../../core/helpers/view_model.dart';
 
-class CreateExpenseViewModel extends GetxController {
+class OtherViewModel extends ViewModel {
   final nameController = TextFormInputController(
-    label: 'Nome Long Coisa Grande, Muito Grande, Muito, Muito Grande',
+    label: 'Nome',
+    placeholder: 'Ex: Detergente, Desodorante, etc',
+  );
+}
+
+class CreateExpenseViewModel extends ViewModel {
+  final nameController = TextFormInputController(
+    label: 'Nome',
+    placeholder: 'Ex: Detergente, Desodorante, etc',
   );
   final valueController = TextFormInputController(
     label: 'Valor',
     prefix: 'R\$ ',
+    placeholder: '0,00',
     keyboardType: TextInputType.number,
     masks: [Mask.currency],
     validators: [Validators.required],
